@@ -8,15 +8,15 @@ Terrastruct's CI scripts.
 
 Currently used by:
 
-- https://github.com/terrastruct/d2
-- https://github.com/terrastruct/d2-docs
+- https://github.com/d2lang/d2
+- https://github.com/d2lang/d2-docs
 - https://github.com/terrastruct/util-go
 - https://github.com/terrastruct/text-to-diagram-site
 - https://github.com/terrastruct/byelinear
 - https://github.com/terrastruct/homebrew-tap
-- https://github.com/terrastruct/d2-obsidian
-- https://github.com/terrastruct/d2-playground
-- https://github.com/terrastruct/d2-vscode
+- https://github.com/d2lang/d2-obsidian
+- https://github.com/d2lang/d2-playground
+- https://github.com/d2lang/d2-vscode
 
 And in our internal monorepo.
 
