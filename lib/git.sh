@@ -203,13 +203,6 @@ git_commit_count() {
   (git rev-list HEAD --count 2>/dev/null) || echo 0
 }
 
-configure_github_token() {
-  git config --global credential.helper store
-  cat > ~/.git-credentials <<EOF
-https://cyborg-ts:$GITHUB_TOKEN@github.com
-EOF
-}
-
 git_pure() {
   if [ -z "${GIT_CONFIG_PURE-}" ]; then
     GIT_CONFIG_PURE="$(mktempd)/gitconfig-pure"
@@ -223,8 +216,8 @@ git_pure() {
       GIT_CONFIG_GLOBAL=$GIT_CONFIG_PURE command git config --global pager.diff 'diff-highlight | less'
     fi
     GIT_CONFIG_GLOBAL=$GIT_CONFIG_PURE command git config --global init.defaultBranch master
-    GIT_CONFIG_GLOBAL=$GIT_CONFIG_PURE command git config --global user.name "Cyborg Tstruct"
-    GIT_CONFIG_GLOBAL=$GIT_CONFIG_PURE command git config --global user.email "info+cyborg@terrastruct.com"
+    GIT_CONFIG_GLOBAL=$GIT_CONFIG_PURE command git config --global user.name "D2 CI"
+    GIT_CONFIG_GLOBAL=$GIT_CONFIG_PURE command git config --global user.email "ci@d2lang.com"
     export _GIT_CONFIG_PURE=1
   fi
   GIT_CONFIG_GLOBAL=$GIT_CONFIG_PURE gitc "$@"
