@@ -8,7 +8,7 @@ help() {
       cat <<EOF
 usage: $0 [...flags] [...zones]
 
-$0 is an example script demonstrating terrastruct/ci's flag.sh library.
+$0 is an example script demonstrating d2lang/ci's flag.sh library.
 It defaults to printing the current time in the same format as date(1)
 but it accepts a myraid of flags to control output.
 

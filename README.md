@@ -1,16 +1,16 @@
 # ci
 
-[![ci](https://github.com/terrastruct/ci/actions/workflows/ci.yml/badge.svg)](https://github.com/terrastruct/ci/actions/workflows/ci.yml)
-[![daily](https://github.com/terrastruct/ci/actions/workflows/daily.yml/badge.svg)](https://github.com/terrastruct/ci/actions/workflows/daily.yml)
-[![license](https://img.shields.io/github/license/terrastruct/ci?color=9cf)](./LICENSE)
+[![ci](https://github.com/d2lang/ci/actions/workflows/ci.yml/badge.svg)](https://github.com/d2lang/ci/actions/workflows/ci.yml)
+[![daily](https://github.com/d2lang/ci/actions/workflows/daily.yml/badge.svg)](https://github.com/d2lang/ci/actions/workflows/daily.yml)
+[![license](https://img.shields.io/github/license/d2lang/ci?color=9cf)](./LICENSE)
 
-Terrastruct's CI scripts.
+Shared CI scripts for D2 and related projects.
 
 Currently used by:
 
 - https://github.com/d2lang/d2
 - https://github.com/d2lang/d2-docs
-- https://github.com/terrastruct/util-go
+- https://github.com/d2lang/util-go
 - https://github.com/terrastruct/text-to-diagram-site
 - https://github.com/terrastruct/byelinear
 - https://github.com/terrastruct/homebrew-tap
