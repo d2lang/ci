@@ -22,8 +22,8 @@ gofmt() {
   if search_up go.mod >/dev/null; then
     modname=$(go list -m)
     case $modname in
-      github.com/terrastruct/*|oss.terrastruct.com/*)
-        GOIMPORTS_LOCAL="${GOIMPORTS_LOCAL:+$GOIMPORTS_LOCAL,}oss.terrastruct.com,github.com/terrastruct";;
+      github.com/d2lang/*|github.com/terrastruct/*|oss.terrastruct.com/*)
+        GOIMPORTS_LOCAL="${GOIMPORTS_LOCAL:+$GOIMPORTS_LOCAL,}oss.terrastruct.com,github.com/terrastruct,github.com/d2lang";;
       *)
         GOIMPORTS_LOCAL="${GOIMPORTS_LOCAL:+$GOIMPORTS_LOCAL,}$modname";;
     esac
