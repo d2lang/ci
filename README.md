@@ -21,3 +21,12 @@ Currently used by:
 And in our internal monorepo.
 
 For robust example usage of the flag parser see [./examples/date.sh](./examples/date.sh).
+
+Use `runjob name command` for foreground work. For parallel work, replace
+`runjob name command &` with `runjob_bg name command`, then call `waitjobs`.
+The launcher records each process ID immediately so completed failures cannot be
+lost from the shell's job list. `waitjobs` rejects unregistered background jobs
+that it can still detect; migrate callers before updating this shared library.
+
+`ci_waitjobs` waits for jobs and checks generated files. Commit-message policy is
+opt-in through `bin/nofixups.sh`; cleanup and notifications do not enforce it.

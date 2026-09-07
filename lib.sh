@@ -11,7 +11,7 @@ ci_go_lint() {
 ci_waitjobs() {
   if [ -z "${CI-}" ]; then
     waitjobs
-    return 0
+    return "$?"
   fi
 
   capcode waitjobs
@@ -24,7 +24,6 @@ ci_waitjobs() {
     notify
     return "$code"
   fi
-  capcode nofixups
   notify
   return "$code"
 }
@@ -435,6 +434,8 @@ LIB_JOB=1
 # and propogating of signals. Not sure how to debug even without something like gdb and
 # going through the source code of the shell too.
 runjob() {(
+  # A child must never wait on its parent's other jobs.
+  JOB_PIDS=
   jobname=$1
   export JOBNAME=${JOBNAME+$JOBNAME/}$jobname
   shift
@@ -462,15 +463,28 @@ runjob() {(
   # We add the prefix to all lines and remove any warning lines about recursive make.
   # We cannot silence these with -s which is unfortunate.
   (sed -e "s#^#$(echop "$jobname"): #" -e "/make\[.\]: warning: -j/d" "$stdout" || true) &
+  RUNJOB_READERS="$!"
   # This intentionally does not output to our stderr, it becomes our stdout.
   (sed -e "s#^#$(echop "$jobname"): #" -e "/make\[.\]: warning: -j/d" "$stderr" || true) &
+  RUNJOB_READERS="$RUNJOB_READERS $!"
 
   start="$(awk 'BEGIN{srand(); print srand()}')"
   trap runjob_exittrap EXIT
   # For some reason without wrapping this in a subshell, the waitjobs in subjob
   # case_notequal_sign of ./lib/flags_test.sh freezes.
-  ( eval "$*" >"$stdout" 2>"$stderr" )
+  ( JOB_PIDS=; eval "$*" >"$stdout" 2>"$stderr" )
 )}
+
+# Use this instead of `runjob ... &` so the shell retains the child's exit status.
+runjob_bg() {
+  _job_bg runjob "$@"
+}
+
+# Register an unprefixed helper without adding a job-filter level.
+_job_bg() {
+  JOB_PIDS= "$@" &
+  JOB_PIDS="${JOB_PIDS-} $!"
+}
 
 _runjob_filter() {
   if [ -z "${JOBFILTER-}" ]; then
@@ -511,42 +525,62 @@ runjob_filter() {
 
 runjob_exittrap() {
   code="$?"
+  trap - EXIT
   end="$(awk 'BEGIN{srand(); print srand()}')"
   dur="$((end - start))"
 
-  waitjobs_sigtrap
+  # Preserve the existing output-reader shutdown behavior. Their status must
+  # never replace the command's exit status.
+  for reader_pid in $RUNJOB_READERS; do
+    kill "$reader_pid" 2>/dev/null || true
+  done
+  for reader_pid in $RUNJOB_READERS; do
+    wait "$reader_pid" 2>/dev/null || true
+  done
   if [ "$code" -eq 0 ]; then
     echop "$jobname\$" "$(setaf 2 success)" "($(echo_dur "$dur"))"
   else
     echop "$jobname\$" "$(setaf 1 failure)" "($(echo_dur "$dur"))"
   fi
+  exit "$code"
 }
 
 waitjobs() {
+  waitjobs_status=0
+  # Fail clearly for legacy callers rather than silently dropping their failures.
+  # `jobs` must run in this shell: dash has an empty job table in substitutions.
   wait_tmpdir="$(mktempd)"
-  jobs -l > "$wait_tmpdir/jobsl"
-  trap waitjobs_sigtrap INT TERM
-
-  jobs -p > "$wait_tmpdir/jobsp"
+  jobs -p >"$wait_tmpdir/jobsp"
   for pid in $(cat "$wait_tmpdir/jobsp"); do
-    if ! wait "$pid"; then
-      caterr <<EOF
-failed to wait on $pid:
-$(<"$wait_tmpdir/jobsl" grep "$pid")
-EOF
-      FAILURE=1
-    fi
+    case " ${JOB_PIDS-} " in
+      *" $pid "*) ;;
+      *)
+        echoerr "unregistered background job $pid: use runjob_bg instead of runjob ... &"
+        JOB_PIDS="${JOB_PIDS-} $pid"
+        waitjobs_status=1
+        ;;
+    esac
   done
-  if [ -n "${FAILURE-}" ]; then
-    return 1
-  fi
+  trap waitjobs_sigtrap INT TERM
+  set -- ${JOB_PIDS-}
+  for pid do
+    if ! wait "$pid"; then
+      echoerr "background job $pid failed"
+      waitjobs_status=1
+    fi
+    shift
+    JOB_PIDS="$*"
+  done
+  JOB_PIDS=
+  trap - INT TERM
+  return "$waitjobs_status"
 }
 
 waitjobs_sigtrap() {
-  for pid in $(jobs -p); do
+  waitjobs_status=1
+  for pid in ${JOB_PIDS-}; do
     kill "$pid" 2> /dev/null || true
   done
-  waitjobs
 }
 
 job_parseflags() {
@@ -1060,9 +1094,6 @@ EOF
     return 1
   fi
 
-  if [ "$code" -eq 0 ]; then
-    capcode nofixups
-  fi
   if [ "$code" -eq 0 ]; then
     status=success
     emoji=🟢

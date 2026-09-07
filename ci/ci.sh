@@ -13,8 +13,8 @@ fmtgen() {
 
 job_parseflags "$@"
 ensure_git_base
-fmtgen &
+_job_bg fmtgen
 if is_changed lib; then
-  runjob test ./ci/test.sh &
+  runjob_bg test ./ci/test.sh
 fi
 ci_waitjobs

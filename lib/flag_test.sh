@@ -153,9 +153,9 @@ case_notequal_sign() {
     assert_term '' "$@"
   }
 
-  runjob case_with_args &
-  runjob case_without_args &
-  runjob case_term &
+  runjob_bg case_with_args
+  runjob_bg case_without_args
+  runjob_bg case_term
   waitjobs
 }
 
@@ -253,11 +253,11 @@ case_flag_fmt() {
 }
 
 job_parseflags "$@"
-runjob case_term &
-runjob case_equal_sign &
-runjob case_notequal_sign &
-runjob case_reqarg &
-runjob case_nonemptyarg &
-runjob case_noarg &
-runjob case_flag_fmt &
+runjob_bg case_term
+runjob_bg case_equal_sign
+runjob_bg case_notequal_sign
+runjob_bg case_reqarg
+runjob_bg case_nonemptyarg
+runjob_bg case_noarg
+runjob_bg case_flag_fmt
 waitjobs
