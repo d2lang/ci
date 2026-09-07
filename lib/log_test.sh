@@ -48,17 +48,19 @@ two" 2>&1)
 }
 
 case4() {
+  TERM=xterm
+  export TERM
   got=$(COLOR=1 FGCOLOR=1 bigheader "one
 two" 2>&1)
-  assert got "$(COLOR=1 tput setaf 1)/****************************************************************$(tput sgr0)
+  assert got "$(COLOR=1 tput setaf 1)/****************************************************************$(COLOR=1 tput sgr0)
 $(COLOR=1 tput setaf 1) * one$(COLOR=1 tput sgr0)
 $(COLOR=1 tput setaf 1) * two$(COLOR=1 tput sgr0)
 $(COLOR=1 tput setaf 1) ****************************************************************/$(COLOR=1 tput sgr0)"
 }
 
 job_parseflags "$@"
-runjob case1 &
-runjob case2 &
-runjob case3 &
-runjob case4 &
+runjob_bg case1
+runjob_bg case2
+runjob_bg case3
+runjob_bg case4
 waitjobs

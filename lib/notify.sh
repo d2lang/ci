@@ -34,9 +34,6 @@ EOF
   fi
 
   if [ "$code" -eq 0 ]; then
-    capcode nofixups
-  fi
-  if [ "$code" -eq 0 ]; then
     status=success
     emoji=🟢
   else

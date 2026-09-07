@@ -55,7 +55,7 @@ d2fmt() {
       curl -fsSL https://d2lang.com/install.sh | sh -s --
     )
   fi
-  sh_c XARGS_N=1 hide xargsd --null "'\.\(d2\)$'" d2 fmt
+  sh_c XARGS_N=1 hide xargsd "'\.\(d2\)$'" d2 fmt
 }
 
 main() {
@@ -66,22 +66,22 @@ main() {
   #   runjob trailing-whitespace trailing_whitespace
   # fi
   if <"$CHANGED_FILES" grep -q '\.\(md\)$'; then
-    runjob mdtocsubst mdtocsubst_xargsd &
+    runjob_bg mdtocsubst mdtocsubst_xargsd
   fi
   if search_up go.mod >/dev/null; then
-    runjob go.mod gomodtidy &
+    runjob_bg go.mod gomodtidy
   fi
   if <"$CHANGED_FILES" grep -q '\.\(go\)$'; then
-    runjob gofmt &
+    runjob_bg gofmt
   fi
   if search_up package.json >/dev/null; then
-    runjob package.json pkgjson &
+    runjob_bg package.json pkgjson
   fi
   if <"$CHANGED_FILES" grep -q '\.\(js\|jsx\|ts\|tsx\|scss\|css\|html\)$'; then
-    runjob prettier &
+    runjob_bg prettier
   fi
   if <"$CHANGED_FILES" grep -qm1 '\.\(d2\)$'; then
-    runjob d2fmt &
+    runjob_bg d2fmt
   fi
   waitjobs
 }

@@ -15,7 +15,7 @@ ci_go_lint() {
 ci_waitjobs() {
   if [ -z "${CI-}" ]; then
     waitjobs
-    return 0
+    return "$?"
   fi
 
   capcode waitjobs
@@ -28,7 +28,6 @@ ci_waitjobs() {
     notify
     return "$code"
   fi
-  capcode nofixups
   notify
   return "$code"
 }
